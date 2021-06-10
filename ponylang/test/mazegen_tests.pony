@@ -68,6 +68,15 @@ object iso is UnitTest
         h.assert_eq[Cell](Cell.create(false, true, false), try undertest.cell(0, 1)? else Cell end)
 end
 object iso is UnitTest
+    fun name(): String => "maze / generate / 2x1 / 1,0"
+    fun apply(h: TestHelper) =>
+        let undertest: Maze = Maze.create(2, 1)
+        let rand: Random = FixedListRandom.fixed(recover val [as U64: 0] end)
+        undertest.generate(1, 0, rand)
+        h.assert_eq[Cell](Cell.create(true, true, false), try undertest.cell(0, 0)? else Cell end)
+        h.assert_eq[Cell](Cell.create(true, false, true), try undertest.cell(1, 0)? else Cell end)
+end
+object iso is UnitTest
     fun name(): String => "maze / cell / 1x1 / 0,0"
     fun apply(h: TestHelper) =>
         let undertest: Maze = Maze.create(1, 1)
@@ -167,7 +176,7 @@ end
 object iso is UnitTest
     fun name(): String => "direction / left / move"
     fun apply(h: TestHelper) =>
-        h.assert_eq[USize](10, Left.move(9, 5)._1)
+        h.assert_eq[USize](8, Left.move(9, 5)._1)
         h.assert_eq[USize](5, Left.move(9, 5)._2)
 end
 
@@ -194,7 +203,7 @@ end
 object iso is UnitTest
     fun name(): String => "direction / right / move"
     fun apply(h: TestHelper) =>
-        h.assert_eq[USize](8, Right.move(9, 5)._1)
+        h.assert_eq[USize](10, Right.move(9, 5)._1)
         h.assert_eq[USize](5, Right.move(9, 5)._2)
 end
 ]

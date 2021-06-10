@@ -5,6 +5,7 @@ trait val Direction
     fun val move(x: USize, y: USize): (USize, USize)
     fun val can_move(x: USize, y: USize, w: USize, h: USize): Bool
     fun val update_cells(base_cell: Cell, to_cell: Cell): (Cell, Cell)
+    fun box string(): String iso^
 
 primitive Up is Direction
     fun val can_move(x: USize, y: USize, w: USize, h: USize): Bool => y != 0
@@ -14,6 +15,7 @@ primitive Up is Direction
             Cell.create(false, base_cell.wall_left, true),
             Cell.create(to_cell.wall_up, to_cell.wall_left, false)
         )
+    fun box string(): String iso^ => recover iso String.create().>append("Up") end
 
 primitive Down is Direction
     fun val can_move(x: USize, y: USize, w: USize, h: USize): Bool => (y+1) != h
@@ -23,24 +25,27 @@ primitive Down is Direction
             Cell.create(base_cell.wall_up, base_cell.wall_left, true),
             Cell.create(false, to_cell.wall_left, false)
         )
+    fun box string(): String iso^ => recover iso String.create().>append("Down") end
 
 primitive Left is Direction
     fun val can_move(x: USize, y: USize, w: USize, h: USize): Bool => x != 0
-    fun val move(x: USize, y: USize): (USize, USize) => (x+1, y)
+    fun val move(x: USize, y: USize): (USize, USize) => (x-1, y)
     fun val update_cells(base_cell: Cell, to_cell: Cell): (Cell, Cell) =>
         (
             Cell.create(base_cell.wall_up, false, true),
             Cell.create(to_cell.wall_up, to_cell.wall_left, false)
         )
+    fun box string(): String iso^ => recover iso String.create().>append("Left") end
 
 primitive Right is Direction
     fun val can_move(x: USize, y: USize, w: USize, h: USize): Bool => (x+1) != w
-    fun val move(x: USize, y: USize): (USize, USize) => (x-1, y)
+    fun val move(x: USize, y: USize): (USize, USize) => (x+1, y)
     fun val update_cells(base_cell: Cell, to_cell: Cell): (Cell, Cell) =>
         (
             Cell.create(base_cell.wall_up, base_cell.wall_left, true),
             Cell.create(to_cell.wall_up, false, false)
         )
+    fun box string(): String iso^ => recover iso String.create().>append("Right") end
 
 class val Cell
     let wall_up: Bool
@@ -60,7 +65,7 @@ class val Cell
             .>append("Cell[")
             .>append("wall_up: ").>append(wall_up.string())
             .>append(", wall_left: ").>append(wall_left.string())
-            .>append(", wall_visited: ").>append(visited.string())
+            .>append(", visited: ").>append(visited.string())
             .>append("]") end
 
 class Maze
@@ -92,7 +97,10 @@ class Maze
     fun ref generate(start_x: USize, start_y: USize, rand: Random) =>
         try
             let option = options_from(start_x, start_y)(0)?
+            @printf[None]("option: %s\n".cstring(), option.string().cstring())
             let next_location = option.move(start_x, start_y)
+            @printf[None]("This location (%s, %s)\n".cstring(), start_x.string().cstring(), start_y.string().cstring())
+            @printf[None]("Next location (%s, %s)\n".cstring(), next_location._1.string().cstring(), next_location._2.string().cstring())
             let next_cells = option.update_cells(
                 cell(start_x, start_y)?,
                 cell(next_location._1, next_location._2)?
