@@ -1,5 +1,19 @@
 
 use "random"
+use "time"
+
+
+actor Main
+    new create(env: Env) =>
+        let w: USize = try env.args(1)?.usize()? else 10 end
+        let h: USize = try env.args(2)?.usize()? else 10 end
+        let now = Time.now()
+        let rand: Random = Rand(now._1.u64(), now._2.u64())
+        let maze: Maze = Maze.create(w,h).>generate(
+            rand.int_unbiased(w.u64()).usize(),
+            rand.int_unbiased(h.u64()).usize(),
+            rand)
+        env.out.print(maze.render())
 
 trait val Direction
     fun val move(x: USize, y: USize): (USize, USize)
@@ -89,38 +103,36 @@ class Maze
         let result: Array[Direction val] trn = recover trn Array[Direction val] end
         for direction in [Up; Down; Left; Right].values() do
             if direction.can_move(x, y, width, height) then
-                result.push(direction)
+                let movement = direction.move(x,y)
+                if not (try cell(movement._1, movement._2)?.visited else false end) then
+                    result.push(direction)
+                end
             end
         end
         consume result
 
     fun ref generate(start_x: USize, start_y: USize, rand: Random) =>
         try
-            let option = options_from(start_x, start_y)(0)?
-            @printf[None]("option: %s\n".cstring(), option.string().cstring())
-            let next_location = option.move(start_x, start_y)
-            @printf[None]("This location (%s, %s)\n".cstring(), start_x.string().cstring(), start_y.string().cstring())
-            @printf[None]("Next location (%s, %s)\n".cstring(), next_location._1.string().cstring(), next_location._2.string().cstring())
-            let next_cells = option.update_cells(
-                cell(start_x, start_y)?,
-                cell(next_location._1, next_location._2)?
-            )
-            cells(index_for(start_x, start_y))? = next_cells._1
-            cells(index_for(next_location._1, next_location._2))? = next_cells._2
+            let queue = Array[(USize, USize)]
+            queue.push( (start_x, start_y) )
+            while queue.size() > 0 do
+                let current = queue.pop()?
+                let options = options_from(current._1, current._2)
+                let move_to = rand.int_unbiased[U64](options.size().u64()).usize()
+                for (id, option) in options.pairs() do
+                    let next_location = option.move(current._1, current._2)
+                    if id == move_to then
+                        let next_cells = option.update_cells(
+                            cell(current._1, current._2)?,
+                            cell(next_location._1, next_location._2)?
+                        )
+                        cells(index_for(current._1, current._2))? = next_cells._1
+                        cells(index_for(next_location._1, next_location._2))? = next_cells._2
+                    end
+                    queue.push(next_location)
+                end
+            end
         end
-
-
-        // let queue = Array[(USize, USize)]
-        // queue.push( (start_x, start_y) )
-        // while queue.size() > 0 do
-        //     let current = queue.pop()?
-        //     let options = options_from(current._1, current._y)
-        //     if options.size > 0 then
-
-        //     end
-        // end
-
-        None
 
     fun ref index_for(x: USize, y: USize): USize =>
         (y*width) + x

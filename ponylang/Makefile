@@ -6,3 +6,6 @@ test:
 
 clean:
 	rm bin/*
+
+build:
+	corral run -- ponyc -o bin mazegen
