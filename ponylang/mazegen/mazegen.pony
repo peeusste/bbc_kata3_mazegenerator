@@ -120,20 +120,9 @@ class Maze
             while queue.size() > 0 do
                 let current = queue.pop()?
                 let options = options_from(current._1, current._2).clone()
-                @printf[None](
-                    "current: (%s, %s) options size: %s\n".cstring(),
-                    current._1.string().cstring(),
-                    current._2.string().cstring(),
-                    options.size().string().cstring()
-                )
                 rand.shuffle[Direction](options)
                 for (id, option) in options.pairs() do
                     let next_location = option.move(current._1, current._2)
-                    @printf[None](
-                        "    next: (%s, %s)\n".cstring(),
-                        next_location._1.string().cstring(),
-                        next_location._2.string().cstring()
-                    )
                     let next_cells = option.update_cells(
                         cell(current._1, current._2)?,
                         cell(next_location._1, next_location._2)?
