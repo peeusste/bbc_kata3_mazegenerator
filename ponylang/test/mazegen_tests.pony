@@ -65,7 +65,7 @@ object iso is UnitTest
         let rand: Random = FixedListRandom.fixed(recover val [as U64: 0] end)
         undertest.generate(0, 0, rand)
         h.assert_eq[Cell](Cell.create(true, true, true), try undertest.cell(0, 0)? else Cell end)
-        h.assert_eq[Cell](Cell.create(false, true, false), try undertest.cell(0, 1)? else Cell end)
+        h.assert_eq[Cell](Cell.create(false, true, true), try undertest.cell(0, 1)? else Cell end)
 end
 object iso is UnitTest
     fun name(): String => "maze / generate / 2x1 / 1,0"
@@ -73,7 +73,7 @@ object iso is UnitTest
         let undertest: Maze = Maze.create(2, 1)
         let rand: Random = FixedListRandom.fixed(recover val [as U64: 0] end)
         undertest.generate(1, 0, rand)
-        h.assert_eq[Cell](Cell.create(true, true, false), try undertest.cell(0, 0)? else Cell end)
+        h.assert_eq[Cell](Cell.create(true, true, true), try undertest.cell(0, 0)? else Cell end)
         h.assert_eq[Cell](Cell.create(true, false, true), try undertest.cell(1, 0)? else Cell end)
 end
 object iso is UnitTest

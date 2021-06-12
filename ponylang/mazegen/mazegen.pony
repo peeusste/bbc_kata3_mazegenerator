@@ -157,23 +157,23 @@ class Maze
         for y in IntIter(height) do
             for x in IntIter(width) do
                 if (try cell(x,y)?.wall_up else false end) then
-                    result.append("*-----")
+                    result.append("*-")
                 else
-                    result.append("*     ")
+                    result.append("* ")
                 end
             end
             result.append("*\n")
             for x in IntIter(width) do
                 if (try cell(x,y)?.wall_left else false end) then
-                    result.>append("| ").>append(x.string()).>append(",").>append(y.string()).>append(" ")
+                    result.>append("| ")
                 else
-                    result.>append("  ").>append(x.string()).>append(",").>append(y.string()).>append(" ")
+                    result.>append("  ")
                 end
             end
             result.append("|\n")
         end
         for x in IntIter(width) do
-            result.append("*-----")
+            result.append("*-")
         end
         result.append("*")
 
