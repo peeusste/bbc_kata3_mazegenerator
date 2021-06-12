@@ -2,7 +2,7 @@
 .PHONY: clean build test
 
 test:
-	corral run -- ponyc -o bin test && ./bin/test
+	corral run -- ponyc -o bin test && ./bin/test --sequential
 
 clean:
 	rm bin/*

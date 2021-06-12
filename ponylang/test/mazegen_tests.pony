@@ -107,7 +107,7 @@ object iso is UnitTest
                 Cell.create(true, true, false)
         )
         h.assert_eq[Cell](Cell.create(false, true, true), result._1)
-        h.assert_eq[Cell](Cell.create(true, true, false), result._2)
+        h.assert_eq[Cell](Cell.create(true, true, true), result._2)
 end
 object iso is UnitTest
     fun name(): String => "direction / up / can_move / no"
@@ -134,7 +134,7 @@ object iso is UnitTest
                 Cell.create(true, true, false)
         )
         h.assert_eq[Cell](Cell.create(true, true, true), result._1)
-        h.assert_eq[Cell](Cell.create(false, true, false), result._2)
+        h.assert_eq[Cell](Cell.create(false, true, true), result._2)
 end
 object iso is UnitTest
     fun name(): String => "direction / down / can_move / no"
@@ -161,7 +161,7 @@ object iso is UnitTest
                 Cell.create(true, true, false)
         )
         h.assert_eq[Cell](Cell.create(true, false, true), result._1)
-        h.assert_eq[Cell](Cell.create(true, true, false), result._2)
+        h.assert_eq[Cell](Cell.create(true, true, true), result._2)
 end
 object iso is UnitTest
     fun name(): String => "direction / left / can_move / no"
@@ -188,7 +188,7 @@ object iso is UnitTest
                 Cell.create(true, true, false)
         )
         h.assert_eq[Cell](Cell.create(true, true, true), result._1)
-        h.assert_eq[Cell](Cell.create(true, false, false), result._2)
+        h.assert_eq[Cell](Cell.create(true, false, true), result._2)
 end
 object iso is UnitTest
     fun name(): String => "direction / right / can_move / no"

@@ -27,7 +27,7 @@ primitive Up is Direction
     fun val update_cells(base_cell: Cell, to_cell: Cell): (Cell, Cell) =>
         (
             Cell.create(false, base_cell.wall_left, true),
-            Cell.create(to_cell.wall_up, to_cell.wall_left, false)
+            to_cell.as_visited()
         )
     fun box string(): String iso^ => recover iso String.create().>append("Up") end
 
@@ -36,8 +36,8 @@ primitive Down is Direction
     fun val move(x: USize, y: USize): (USize, USize) => (x, y+1)
     fun val update_cells(base_cell: Cell, to_cell: Cell): (Cell, Cell) =>
         (
-            Cell.create(base_cell.wall_up, base_cell.wall_left, true),
-            Cell.create(false, to_cell.wall_left, false)
+            base_cell.as_visited(),
+            Cell.create(false, to_cell.wall_left, true)
         )
     fun box string(): String iso^ => recover iso String.create().>append("Down") end
 
@@ -47,7 +47,7 @@ primitive Left is Direction
     fun val update_cells(base_cell: Cell, to_cell: Cell): (Cell, Cell) =>
         (
             Cell.create(base_cell.wall_up, false, true),
-            Cell.create(to_cell.wall_up, to_cell.wall_left, false)
+            to_cell.as_visited()
         )
     fun box string(): String iso^ => recover iso String.create().>append("Left") end
 
@@ -56,8 +56,8 @@ primitive Right is Direction
     fun val move(x: USize, y: USize): (USize, USize) => (x+1, y)
     fun val update_cells(base_cell: Cell, to_cell: Cell): (Cell, Cell) =>
         (
-            Cell.create(base_cell.wall_up, base_cell.wall_left, true),
-            Cell.create(to_cell.wall_up, false, false)
+            base_cell.as_visited(),
+            Cell.create(to_cell.wall_up, false, true)
         )
     fun box string(): String iso^ => recover iso String.create().>append("Right") end
 
@@ -69,6 +69,8 @@ class val Cell
         wall_up = wu'
         wall_left = wl'
         visited = visited'
+    fun val as_visited(): Cell =>
+        Cell(wall_up, wall_left, true)
     fun box eq(that: Cell): Bool =>
         (wall_left == that.wall_left)
             and (wall_up == that.wall_up)
@@ -117,18 +119,27 @@ class Maze
             queue.push( (start_x, start_y) )
             while queue.size() > 0 do
                 let current = queue.pop()?
-                let options = options_from(current._1, current._2)
-                let move_to = rand.int_unbiased[U64](options.size().u64()).usize()
+                let options = options_from(current._1, current._2).clone()
+                @printf[None](
+                    "current: (%s, %s) options size: %s\n".cstring(),
+                    current._1.string().cstring(),
+                    current._2.string().cstring(),
+                    options.size().string().cstring()
+                )
+                rand.shuffle[Direction](options)
                 for (id, option) in options.pairs() do
                     let next_location = option.move(current._1, current._2)
-                    if id == move_to then
-                        let next_cells = option.update_cells(
-                            cell(current._1, current._2)?,
-                            cell(next_location._1, next_location._2)?
-                        )
-                        cells(index_for(current._1, current._2))? = next_cells._1
-                        cells(index_for(next_location._1, next_location._2))? = next_cells._2
-                    end
+                    @printf[None](
+                        "    next: (%s, %s)\n".cstring(),
+                        next_location._1.string().cstring(),
+                        next_location._2.string().cstring()
+                    )
+                    let next_cells = option.update_cells(
+                        cell(current._1, current._2)?,
+                        cell(next_location._1, next_location._2)?
+                    )
+                    cells(index_for(current._1, current._2))? = next_cells._1
+                    cells(index_for(next_location._1, next_location._2))? = next_cells._2
                     queue.push(next_location)
                 end
             end
@@ -146,23 +157,23 @@ class Maze
         for y in IntIter(height) do
             for x in IntIter(width) do
                 if (try cell(x,y)?.wall_up else false end) then
-                    result.append("*-")
+                    result.append("*-----")
                 else
-                    result.append("* ")
+                    result.append("*     ")
                 end
             end
             result.append("*\n")
             for x in IntIter(width) do
                 if (try cell(x,y)?.wall_left else false end) then
-                    result.append("| ")
+                    result.>append("| ").>append(x.string()).>append(",").>append(y.string()).>append(" ")
                 else
-                    result.append("  ")
+                    result.>append("  ").>append(x.string()).>append(",").>append(y.string()).>append(" ")
                 end
             end
             result.append("|\n")
         end
         for x in IntIter(width) do
-            result.append("*-")
+            result.append("*-----")
         end
         result.append("*")
 
