@@ -54,3 +54,21 @@ func TestGenerateMaze(t *testing.T) {
 		t.Errorf("maze not rendered: contains %d bytes", buf.Size())
 	}
 }
+
+func TestGenerateMazeWithMaxStartPosition(t *testing.T) {
+
+	width := 10
+	height := 10
+	start := maze.Position{
+		X: width - 1,
+		Y: height - 1,
+	}
+
+	m := maze.New(10, 10, start)
+
+	mX := len(m.Cells[0])
+	mY := len(m.Cells)
+	if len(m.Cells) != 10 && len(m.Cells[0]) != 10 {
+		t.Errorf("%d by %d maze not generated correctly: is %d by %d ", width, height, mX, mY)
+	}
+}
